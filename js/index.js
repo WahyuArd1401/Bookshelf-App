@@ -1,10 +1,3 @@
-// {
-//   id: idBuku,
-//   judul : judulBuku,
-//   penulis : penulisBuku,
-//   tahun : tahunBuku,
-//   isCompleted: false,
-// }
 const books = []
 const RENDER_EVENT = 'render-book'
 const SAVE_EVENT = 'save-book'
@@ -18,24 +11,24 @@ document.addEventListener('DOMContentLoaded', function () {
     submitForm.reset()
   })
 
-  document.getElementById('searchSubmit').addEventListener('click', (event)=>{
+  document.getElementById('searchSubmit').addEventListener('click', (event) => {
     event.preventDefault()
     const searchBookTitle = document.getElementById('searchBookTitle').value.toLowerCase()
     const bookList = document.querySelectorAll('.book_item > h3')
-    for(const book of bookList){
-      if(searchBookTitle != ''){
-        if(searchBookTitle === book.innerText.toLowerCase()){
+    for (const book of bookList) {
+      if (searchBookTitle != '') {
+        if (book.innerText.toLowerCase().includes(searchBookTitle.toLowerCase())) {
           book.parentElement.style.display = 'block'
         } else {
           book.parentElement.style.display = 'none'
         }
       } else {
         book.parentElement.style.display = 'block'
-      } 
+      }
     }
   })
 
-  if(isStorageExist()){
+  if (isStorageExist()) {
     loadDataFromStorage()
   }
 })
@@ -54,55 +47,54 @@ function generateId() {
   return +new Date();
 }
 
-function findBook(bookId){
-  for(const bookItem of books){
-    if(bookItem.id == bookId){
+function findBook(bookId) {
+  for (const bookItem of books) {
+    if (bookItem.id == bookId) {
       return bookItem
     }
   }
   return null
 }
 
-function findBookIndex(bookId){
-  for(let index = 0; index < books.length; index++){
-    if(books[index].id === bookId){
+function findBookIndex(bookId) {
+  for (let index = 0; index < books.length; index++) {
+    if (books[index].id === bookId) {
       return index;
     }
   }
   return -1
 }
 
-function saveData(){
-  if(isStorageExist){
+function saveData() {
+  if (isStorageExist) {
     const dataParsed = JSON.stringify(books)
     localStorage.setItem(STORAGE_KEY, dataParsed)
     document.dispatchEvent(new Event(SAVE_EVENT))
   }
 }
 
-function isStorageExist(){
-  if(typeof(Storage) === 'undefined'){
+function isStorageExist() {
+  if (typeof (Storage) === 'undefined') {
     alert('Browser tidak mendukung web storage')
     return false
   }
   return true
 }
 
-function loadDataFromStorage(){
+function loadDataFromStorage() {
   const data = JSON.parse(localStorage.getItem(STORAGE_KEY))
-  if(data !== null){
-    for(const bookItem of data){
+  if (data !== null) {
+    for (const bookItem of data) {
       books.push(bookItem)
     }
   }
-  
+
   document.dispatchEvent(new Event(RENDER_EVENT))
 }
 
 function makeBook(bookObject) {
   const { id, title, author, year, isCompleted } = bookObject
 
-  //Buat masing2 elemen untuk buku
   const bookTitle = document.createElement('h3')
   bookTitle.innerText = title
   const bookAuthor = document.createElement('p')
@@ -152,15 +144,15 @@ function makeBook(bookObject) {
 function addBook() {
   const inputBookTitle = document.getElementById('inputBookTitle').value
   const inputBookAuthor = document.getElementById('inputBookAuthor').value
-  const inputBookYear = document.getElementById('inputBookYear').value
+  const inputBookYear = parseInt(document.getElementById('inputBookYear').value)
   const inputBookIsComplete = document.getElementById('inputBookIsComplete').checked
 
   const bookId = generateId()
   const bookObject = generateBookObject(bookId, inputBookTitle, inputBookAuthor, inputBookYear, inputBookIsComplete)
 
-  if(!isDuplicate(inputBookTitle)){
+  if (!isDuplicate(inputBookTitle)) {
     books.push(bookObject)
-  } else{
+  } else {
     alert('Anda menambahkan buku duplikasi')
   }
 
@@ -168,40 +160,40 @@ function addBook() {
   saveData()
 }
 
-function addBookToCompleted(bookId){
+function addBookToCompleted(bookId) {
   const bookTarget = findBook(bookId)
 
-  if(bookTarget == null) return;
+  if (bookTarget == null) return;
 
   bookTarget.isCompleted = true
   document.dispatchEvent(new Event(RENDER_EVENT))
   saveData()
 }
 
-function undoBookToCompleted(bookId){
+function undoBookToCompleted(bookId) {
   const bookTarget = findBook(bookId)
 
-  if(bookTarget == null) return;
+  if (bookTarget == null) return;
 
   bookTarget.isCompleted = false
   document.dispatchEvent(new Event(RENDER_EVENT))
   saveData()
 }
 
-function removeBook(bookId){
+function removeBook(bookId) {
   const bookTarget = findBookIndex(bookId)
 
-  if(bookTarget === -1) return;
+  if (bookTarget === -1) return;
 
   books.splice(bookTarget, 1)
   document.dispatchEvent(new Event(RENDER_EVENT))
   saveData()
 }
 
-function isDuplicate(title){
+function isDuplicate(title) {
   let flag = false
-  for(const book of books){
-    if(book.title.toLowerCase() === title.toLowerCase()){
+  for (const book of books) {
+    if (book.title.toLowerCase() === title.toLowerCase()) {
       flag = true
     }
   }
@@ -226,6 +218,6 @@ document.addEventListener(RENDER_EVENT, function () {
   }
 })
 
-document.addEventListener(SAVE_EVENT, ()=>{
+document.addEventListener(SAVE_EVENT, () => {
   console.log('Data telah disimpan')
 })
