@@ -11,9 +11,28 @@ const SAVE_EVENT = 'save-book'
 const STORAGE_KEY = 'BOOKSHELF-APPS'
 
 document.addEventListener('DOMContentLoaded', function () {
-  document.getElementById('inputBook').addEventListener('submit', function (event) {
+  const submitForm = document.getElementById('inputBook')
+  submitForm.addEventListener('submit', function (event) {
     event.preventDefault()
     addBook()
+    submitForm.reset()
+  })
+
+  document.getElementById('searchSubmit').addEventListener('click', (event)=>{
+    event.preventDefault()
+    const searchBookTitle = document.getElementById('searchBookTitle').value.toLowerCase()
+    const bookList = document.querySelectorAll('.book_item > h3')
+    for(const book of bookList){
+      if(searchBookTitle != ''){
+        if(searchBookTitle === book.innerText.toLowerCase()){
+          book.parentElement.style.display = 'block'
+        } else {
+          book.parentElement.style.display = 'none'
+        }
+      } else {
+        book.parentElement.style.display = 'block'
+      } 
+    }
   })
 
   if(isStorageExist()){
@@ -37,7 +56,7 @@ function generateId() {
 
 function findBook(bookId){
   for(const bookItem of books){
-    if(bookItem.id = bookId){
+    if(bookItem.id == bookId){
       return bookItem
     }
   }
@@ -45,7 +64,7 @@ function findBook(bookId){
 }
 
 function findBookIndex(bookId){
-  for(const index of books){
+  for(let index = 0; index < books.length; index++){
     if(books[index].id === bookId){
       return index;
     }
@@ -91,7 +110,7 @@ function makeBook(bookObject) {
   const bookYear = document.createElement('p')
   bookYear.innerText = `Tahun : ${year}`
   const isBookComplete = document.createElement('p')
-  isBookComplete.innerText = `Sudah dibaca : ${isBookComplete}`
+  isBookComplete.innerText = `Sudah dibaca : ${isCompleted}`
   const actionDiv = document.createElement('div')
   actionDiv.classList.add('action')
 
